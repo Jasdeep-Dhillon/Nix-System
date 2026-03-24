@@ -1,0 +1,65 @@
+{ pkgs, ... }:
+{
+  hardware.graphics.enable32Bit = true;
+  programs.steam = {
+    enable = true;
+    # package = (
+    #   pkgs.steam.override {
+    #     extraEnv = {
+    #       MANGOHUD = true;
+    #     };
+    #   }
+    # );
+    extraCompatPackages = with pkgs; [
+      proton-ge-bin
+    ];
+    remotePlay.openFirewall = true; # Open ports in the firewall for Steam Remote Play
+    dedicatedServer.openFirewall = true; # Open ports in the firewall for Source Dedicated Server
+    localNetworkGameTransfers.openFirewall = true;
+    # gamescopeSession.enable = true;
+  };
+  programs.gamescope = {
+    enable = true;
+    capSysNice = true;
+    package = pkgs.gamescope-wsi;
+    args = [
+      "--rt"
+      "--mangoapp"
+      "--adaptive-sync"
+      "-O DP-5,eDP-1"
+      "-r 360"
+      # "--prefer-vk-device 8086:9bc4"
+    ];
+    env = # for Prime render offload on Nvidia laptops.
+      # Also requires `hardware.nvidia.prime.offload.enable`.
+      {
+        __NV_PRIME_RENDER_OFFLOAD = "1";
+        __VK_LAYER_NV_optimus = "NVIDIA_only";
+        __GLX_VENDOR_LIBRARY_NAME = "nvidia";
+      };
+  };
+  programs.gamemode = {
+    enable = true;
+    # settings = {
+    #   general = {
+    #     renice = 20;
+    #     softrealtime = "auto";
+    #   };
+    # };
+  };
+  environment.systemPackages = with pkgs; [
+    mangohud
+    sgdboop
+    winetricks
+    wineWow64Packages.unstableFull
+    nero-umu
+    faugus-launcher
+    protonplus
+    # umu-launcher
+    # wineWowPackages.staging
+    ryubing
+  ];
+  environment.sessionVariables = {
+    STEAM_EXTRA_COMPAT_TOOLS_PATH = "\${HOME}/.steam/root/compatibilitytools.d";
+  };
+}
