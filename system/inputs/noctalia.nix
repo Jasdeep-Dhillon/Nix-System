@@ -1,0 +1,8 @@
+{ pkgs, inputs, ... }:
+{
+  imports = [ inputs.noctalia.nixosModules.default ];
+  environment.systemPackages = [
+    inputs.noctalia.packages.${pkgs.stdenv.hostPlatform.system}.default
+  ];
+  services.noctalia-shell.enable = true;
+}
